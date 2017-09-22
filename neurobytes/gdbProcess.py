@@ -23,26 +23,28 @@ class gdbProcess(object):
 
     def run(self):
         while (True):
+            #click.echo('loo')
             try:
-                gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option],stdout=subprocess.PIPE, universal_newlines=True)
+                gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option],stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
                 while(True):
                     for line in iter(gdbProc.stdout.readline, ""):
                         
                         if line == "":
                             break
-                        if "can't attach" in line:
+                        elif "can't attach" in line:
                             self.connected = False
                         elif "attached" in line:
                             if self.connected == False:
                                 click.echo("Attached")
                             self.connected = True
-                        click.echo('loop')
-                        click.echo(line)
+                        else:
+                            pass
+                            #click.echo(line)
                         
-                    print 'loop'
                     if gdbProc.stdout.readline() == "" or gdbProc.poll is None:
                         break
                     time.sleep(0.01)
+                gdbProc.kill()
             except ConnectError:
                 click.echo("No device attached")
                 time.sleep(0.1)

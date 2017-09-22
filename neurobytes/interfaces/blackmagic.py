@@ -3,11 +3,27 @@ import re
 import struct
 import neurobytes.exceptions
 
+device_types = {
+    1 : "interneuron",
+    2 : "photoreceptor",
+    3 : "motor_neuron",
+    4 : "tonic_neuron",
+    5 : "touch_sensor",
+    6 : "vestibular",
+    7 : "force_sensor",
+    8 : "cochlea"
+}
+
 def read_fingerprint():
     inferior = gdb.selected_inferior()
     mem = inferior.read_memory(0x08003e00, 12) # this seems wrong. shouldnt it be 0x08023e00?
     fingerprint = struct.unpack_from('iii', mem)
     return fingerprint
+
+def make_elf(device_type):
+    firmware = os.tmpfile()
+    
+    pass
 
 if __name__ == "__main__":
     print 'gdb alive'
@@ -27,7 +43,7 @@ if __name__ == "__main__":
 
     try:
         gdb.execute("mon tpwr enable")
-        gdb.execute("mon swdp_scan")
+        str = gdb.execute("mon swdp_scan")
     except:
         pass
 
@@ -36,11 +52,11 @@ if __name__ == "__main__":
         print "attached"
     except:
         print "can't attach"
-        #raise neurobytes.exceptions.ConnectError(message="Failed to attach.")
-    
+        pass
     try:
-        fingerprint = read_fingerprint()
-        print fingerprint
+        (device_type, firmware_version, unique_id) = read_fingerprint()
+
+        
     except:
         pass
     
