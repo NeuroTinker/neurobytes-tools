@@ -1,0 +1,3 @@
+include README.md
+include neurobytes_programmer/firmware/*.elf
+include neurobytes_programmer/firmware/*.py
