@@ -3,6 +3,7 @@ import time
 import re
 import subprocess
 import click
+import os
 from neurobytes.exceptions import ConnectError
 
 class gdbProcess(object):
@@ -23,7 +24,7 @@ class gdbProcess(object):
 
     def run(self):
         while (True):
-            #click.echo('loo')
+            flash_count = 0
             try:
                 gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option],stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
                 while(True):
@@ -37,6 +38,15 @@ class gdbProcess(object):
                             if self.connected == False:
                                 click.echo("Attached")
                             self.connected = True
+                        elif "oad" in line:
+                            #click.echo('load')
+                            if flash_count == 0:
+                                bar = click.progressbar(length=4, label="flashing...")
+                            elif flash_count <5:
+                                bar.update(1)
+                            else:
+                                flash_count = 0
+                            flash_count += 1
                         else:
                             pass
                             #click.echo(line)

@@ -39,7 +39,7 @@ class firmware(object):
     def make_url(self, device, branch):
         return self.git_base + device + "/blob/" + branch + self.git_extension
 
-    def __init__(self, elf_file=re.sub(r'elfs.pyc', '', __file__)):
+    def __init__(self, elf_file=re.sub(r'firmware.pyc', '', __file__)):
         self.file = str(elf_file)
         print self.file
 

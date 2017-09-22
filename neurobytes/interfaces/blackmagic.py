@@ -2,6 +2,7 @@ import os
 import re
 import struct
 import neurobytes.exceptions
+import time
 
 device_types = {
     1 : "interneuron",
@@ -14,21 +15,26 @@ device_types = {
     8 : "cochlea"
 }
 
+fingerprint_elf_address = 0x023e00
+elf_path = "/usr/local/lib/python2.7/dist-packages/neurobytes/firmware/"
+
 def read_fingerprint():
     inferior = gdb.selected_inferior()
     mem = inferior.read_memory(0x08003e00, 12) # this seems wrong. shouldnt it be 0x08023e00?
     fingerprint = struct.unpack_from('iii', mem)
     return fingerprint
 
-def make_elf(device_type):
-    firmware = os.tmpfile()
-    
-    pass
+def make_elf(device_type, unique_id):
+    firmware_path = elf_path+device_types[device_type]+".elf"
+    with open(firmware_path, 'r+') as f:
+        f.seek(fingerprint_elf_address + 0x8)
+        f.write(struct.pack('i', unique_id))
+        f.close()
+    return firmware_path
 
 if __name__ == "__main__":
     print 'gdb alive'
     # gdb script
-    fingerprint_elf_address = 0x023e00
 
     try:
         gdb.execute("tar extended-remote /dev/ttyACM0")
@@ -54,11 +60,14 @@ if __name__ == "__main__":
         print "can't attach"
         pass
     try:
-        (device_type, firmware_version, unique_id) = read_fingerprint()
-
-        
+        (device_type, firmware_version, unique_id) = read_fingerprint() 
+        firmware_path = make_elf(device_type, unique_id)
+        gdb.execute("file " + firmware_path)
+        gdb.execute("load")
     except:
         pass
+    
+    #gdb.execute('run')
     
     gdb.execute("quit")
 
