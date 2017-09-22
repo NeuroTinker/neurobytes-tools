@@ -1,1 +1,3 @@
-neurobytes python module and CLI
+#NeuroBytes CLI
+
+##Installation

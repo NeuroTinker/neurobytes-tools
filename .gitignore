@@ -1,3 +1,4 @@
 /.vscode/
 *.pyc
 *.elf
+/neurobytes_programmer.egg-info/
