@@ -11,5 +11,8 @@ setup(
     packages = ["neurobytes", "neurobytes.interfaces", "neurobytes.firmware"],
     zip_safe = False,
     entry_points ={'console_scripts': ['neurobytes=neurobytes.cli:cli']},
-    include_package_data=True
+    include_package_data=True,
+    install_requires=[
+        'click'
+    ]
 )
