@@ -40,13 +40,17 @@ class gdbProcess(object):
                             self.connected = True
                         elif "oad" in line:
                             #click.echo('load')
-                            if flash_count == 0:
-                                bar = click.progressbar(length=4, label="flashing...")
-                            elif flash_count <5:
+                            flash_count += 1
+                            if flash_count == 1:
+                                bar = click.progressbar(length=3, label="flashing...")
+                                bar.update(1)
+                            elif flash_count <3:
                                 bar.update(1)
                             else:
                                 flash_count = 0
-                            flash_count += 1
+                                time.sleep(0.1)
+                                bar.update(1)
+                                click.echo(" COMPLETE")
                         else:
                             pass
                             #click.echo(line)

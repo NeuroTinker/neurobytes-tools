@@ -67,7 +67,10 @@ if __name__ == "__main__":
     except:
         pass
     
-    #gdb.execute('run')
+    try:
+        gdb.execute('run')
+    except:
+        pass
     
     gdb.execute("quit")
 
