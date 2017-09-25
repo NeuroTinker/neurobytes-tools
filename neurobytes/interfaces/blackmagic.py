@@ -26,6 +26,7 @@ def read_fingerprint():
 
 def make_elf(device_type, unique_id):
     firmware_path = elf_path+device_types[device_type]+".elf"
+    print firmware_path
     with open(firmware_path, 'r+') as f:
         f.seek(fingerprint_elf_address + 0x8)
         f.write(struct.pack('i', unique_id))
@@ -55,13 +56,15 @@ if __name__ == "__main__":
 
     try:
         gdb.execute("attach 1")
-        print "attached"
     except:
         print "can't attach"
         pass
     try:
-        (device_type, firmware_version, unique_id) = read_fingerprint() 
+        (device_type, firmware_version, unique_id) = read_fingerprint()
+        print "Connected to {}--{}\n".format(device_types[device_type], unique_id)
+        print device_types[device_type]
         firmware_path = make_elf(device_type, unique_id)
+        print firmware_path
         gdb.execute("file " + firmware_path)
         gdb.execute("load")
     except:

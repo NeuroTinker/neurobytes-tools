@@ -51,6 +51,8 @@ class gdbProcess(object):
                                 time.sleep(0.1)
                                 bar.update(1)
                                 click.echo(" COMPLETE")
+                        elif "Connected " in line:
+                            click.echo(line)
                         else:
                             pass
                             #click.echo(line)
