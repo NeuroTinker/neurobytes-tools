@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "neurobytes",
-    version = "0.1",
+    version = "0.11",
     description = "NeuroBytes Python Module and CLI",
     url = "https://github.com/NeuroTinker/neurobytes-python",
     author = "Jarod White",
