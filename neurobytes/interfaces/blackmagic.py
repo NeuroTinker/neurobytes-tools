@@ -56,12 +56,13 @@ if __name__ == "__main__":
 
     try:
         gdb.execute("attach 1")
+        print "attached"
     except:
         print "can't attach"
         pass
     try:
         (device_type, firmware_version, unique_id) = read_fingerprint()
-        print "Connected to {}--{}\n".format(device_types[device_type], unique_id)
+        print "Connected to {} {}\n".format(device_types[device_type], unique_id)
         print device_types[device_type]
         firmware_path = make_elf(device_type, unique_id)
         print firmware_path

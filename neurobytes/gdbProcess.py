@@ -29,22 +29,21 @@ class gdbProcess(object):
                 gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option],stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
                 while(True):
                     for line in iter(gdbProc.stdout.readline, ""):
-                        
+                        #click.echo(line)
                         if line == "":
                             break
                         elif "can't attach" in line:
                             self.connected = False
                         elif "attached" in line:
                             if self.connected == False:
-                                click.echo("Attached")
+                                pass
                             self.connected = True
                         elif "oad" in line:
-                            #click.echo('load')
                             flash_count += 1
                             if flash_count == 1:
-                                bar = click.progressbar(length=3, label="flashing...")
+                                bar = click.progressbar(length=4, label="flashing...")
                                 bar.update(1)
-                            elif flash_count <3:
+                            elif flash_count <4:
                                 bar.update(1)
                             else:
                                 flash_count = 0
