@@ -7,12 +7,16 @@ Install dependencies
 Install neurobytes CLI,
 >sudo pip install neurobytes
 
+## Updating
+Update with pip
+>sudo pip install neurobytes --upgrade
+
 ## Flashing NeuroBytes
 Update stored firmware,
 >neurobytes update
 
 Flash latest firmware
->neurobytes program
+>neurobytes flash
 
 Flash *.elf file from your current directory (file name optional)
 >neurobytes program -e {FILE_NAME.elf}
