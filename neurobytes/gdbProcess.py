@@ -10,14 +10,16 @@ class gdbProcess(object):
 
     gdb_command = "arm-none-eabi-gdb"
     gdb_batch_option = "--batch"
+    gdb_file_option = None
 
     connected = False
 
-    def __init__(self, interval, interface):
+    def __init__(self, interval, interface, local_elf=None):
 
         self.interval = interval
         self.interface = interface
         self.gdb_command_option = "--command=" + self.interface.file
+        self.gdb_file_option = local_elf
         thread = threading.Thread(target=self.run, args=())
         thread.daemon = True
         thread.start()
@@ -26,7 +28,10 @@ class gdbProcess(object):
         while (True):
             flash_count = 0
             try:
-                gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option],stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
+                if self.gdb_file_option is not None:
+                    gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option, self.gdb_file_option],stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
+                else:
+                    gdbProc = subprocess.Popen([self.gdb_command, self.gdb_batch_option, self.gdb_command_option],stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
                 while(True):
                     for line in iter(gdbProc.stdout.readline, ""):
                         #click.echo(line)

@@ -4,6 +4,7 @@ from neurobytes.firmware import firmware
 import click
 import time
 from neurobytes.exceptions import ConnectError
+from shutil import copyfile
 
 @click.group()
 def cli():
@@ -41,8 +42,18 @@ def update():
     help="Specify programming interface to use"
 )
 def flash(elf, dev, interface):
+    if interface == 'blackmagic':
+        interface_obj = blackmagic.blackmagic()
+    elif interface == 'raspi':
+        pass
+        # TODO: add bit-banged raspi swd interfac.e probably split interfaces into gdb and openocd
+
     try:
-        gdb_thread = gdbProcess.gdbProcess(0.01, blackmagic.blackmagic())
+        if elf:
+            click.echo("Flashing with " + elf)
+            gdb_thread = gdbProcess.gdbProcess(0.01, interface_obj, elf)
+        else:
+            gdb_thread = gdbProcess.gdbProcess(0.01, interface_obj)
     except ConnectError:
         print "connect error"
     while True:
