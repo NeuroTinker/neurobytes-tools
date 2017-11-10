@@ -9,6 +9,10 @@ from shutil import copyfile
 @click.group()
 def cli():
     pass
+@click.command()
+
+def nid():
+    click.echo('nid')
 
 @click.command()
 
@@ -61,3 +65,4 @@ def flash(elf, dev, interface):
 
 cli.add_command(flash)
 cli.add_command(update)
+cli.add_command(nid)
