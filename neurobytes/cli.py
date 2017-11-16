@@ -1,6 +1,7 @@
 from neurobytes import gdbProcess
 from neurobytes.interfaces import blackmagic
 from neurobytes.firmware import firmware
+from neurobytes import nid
 import click
 import time
 from neurobytes.exceptions import ConnectError
@@ -12,7 +13,11 @@ def cli():
 @click.command()
 
 def nid():
-    click.echo('nid')
+    click.echo('Initializing Network Interface Device...')
+    try:
+        nid_handle = nid.nidHandler()
+    except:
+        click.echo("Couldn't connect to NID! Make sure the NID is connected and try again")
 
 @click.command()
 
