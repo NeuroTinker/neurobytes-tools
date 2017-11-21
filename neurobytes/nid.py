@@ -86,13 +86,20 @@ class nidHandler(object):
         while True:
             # check for message from NID
             # read if a whole packet (4 bytes) has been received
-            if self.usb.in_waiting >= 4:
-                raw_msg = self.usb.read(4)
-                msg_as_uint32 = struct.unpack_from(">I", raw_msg)
-                header = (msg_as_uint32[0] >> 27) & 0b1111
-                #handler = self.message_lookup[header]
-                handler = self.message_lookup[0b1010]
-                handler(self, raw_msg)
+            count = self.usb.in_waiting
+            num_msg_waiting = count / 4
+            if num_msg_waiting >= 1 and count%4 == 0:
+                for i in xrange(num_msg_waiting):
+                    raw_msg = self.usb.read(4)
+                    msg_as_uint32 = struct.unpack_from(">I", raw_msg)
+                    print bin(msg_as_uint32[0])
+                    print (num_msg_waiting)
+                    header = (msg_as_uint32[0] >> 27) & 0b1111
+                    try:
+                        handler = self.message_lookup[header]
+                        handler(self, raw_msg)
+                    except:
+                        pass
             elif not self._ping_ev.isSet():
                 self.write_message(ping_message)
                 self._ping_ev.set()
@@ -126,6 +133,7 @@ class nidHandler(object):
         if channel in self.graphs:
             self.graphs[channel].update(data)
         else:
+            click.echo ("Channel " + str(channel) + " identified")
             self.graphs[channel] = potentialGraph(channel)
 
     command_lookup = {
