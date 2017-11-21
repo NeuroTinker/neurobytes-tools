@@ -92,8 +92,8 @@ class nidHandler(object):
                 for i in xrange(num_msg_waiting):
                     raw_msg = self.usb.read(4)
                     msg_as_uint32 = struct.unpack_from(">I", raw_msg)
-                    print bin(msg_as_uint32[0])
-                    print (num_msg_waiting)
+                    # print bin(msg_as_uint32[0])
+                    # print (num_msg_waiting)
                     header = (msg_as_uint32[0] >> 27) & 0b1111
                     try:
                         handler = self.message_lookup[header]
