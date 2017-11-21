@@ -27,6 +27,20 @@ blink_message = [
     chr(0b00000000)
 ]
 
+version_message = lambda dev, ver: [
+    chr(0b11000000),
+    chr(0b10000000 | (dev<<1) | (ver>>7)),
+    chr(ver<<1),
+    chr(0b00000000)
+]
+
+set_dendrite = lambda chan, dend, mag: [
+    chr(0b11010000 | (chan<<1)),
+    chr(0b00000000 | (dend<<4) | (mag>>12)),
+    chr(mag>>4),
+    chr(mag<<4)
+]
+
 class potentialGraph(object):
     plot_pos_lookup = {
         1 : 221,
@@ -110,6 +124,26 @@ class nidHandler(object):
     def send_blink(self, *args):
         self._cmd_msg = blink_message
         click.echo('Blink sent')
+    
+    def send_version(self, *args):
+        # There should be two arguments: device and version
+        device = args[0]
+        version = args[1]
+        self._cmd_msg = version_message(device, version)
+        click.echo('Version check sent')
+    
+    def set_parameter(self, *args):
+        # One argument: "set [channel]". Ask what parameter they want to set.
+        channel = args[0]
+        click.echo("Adjusting parameter on channel " + str(channel))
+        raw1 = raw_input("Parameter to set: ")
+        if raw1 not in self.parameter_lookup:
+            click.echo('Parameter not found.')
+        else:
+            raw2 = raw_input("Enter new magnitude: ")
+            self._cmd_msg = set_dendrite(int(channel[0]), self.parameter_lookup[raw1], int(raw2))
+            click.echo("Parameter set."))
+
 
     def send_identify(self, *args):
         try:
@@ -135,11 +169,20 @@ class nidHandler(object):
         else:
             click.echo ("Channel " + str(channel) + " identified")
             self.graphs[channel] = potentialGraph(channel)
+    
+    parameter_lookup = {
+        'dendrite 1' : 0b010,
+        'dendrite 2' : 0b011,
+        'dendrite 3' : 0b100,
+        'dendrite 4' : 0b101,
+    }
 
     command_lookup = {
         'identify' : send_identify,
         'blink' : send_blink,
-        'quit'  : recv_quit
+        'quit'  : recv_quit,
+        'version' : send_version,
+        'set' : set_parameter
     }
 
     message_lookup = {
