@@ -84,7 +84,6 @@ class nidHandler(object):
             raw = raw_input('(nid) ').split()
             cmd = raw[0]
             args = raw[1:]
-            self._cmd_ev.clear()
             self.command_lookup[cmd](self, args)
             self._cmd_ev.wait() 
 
@@ -108,7 +107,8 @@ class nidHandler(object):
                     msg_as_uint32 = struct.unpack_from(">I", raw_msg)
                     # print bin(msg_as_uint32[0])
                     # print (num_msg_waiting)
-                    header = (msg_as_uint32[0] >> 27) & 0b1111
+                    header = (msg_as_uint32[0] >> 28) & 0b1111
+                    # print bin(header)
                     try:
                         handler = self.message_lookup[header]
                         handler(self, raw_msg)
@@ -122,6 +122,7 @@ class nidHandler(object):
                 self._cmd_ev.set()
 
     def send_blink(self, *args):
+        self._cmd_ev.clear()
         self._cmd_msg = blink_message
         click.echo('Blink sent')
     
@@ -129,6 +130,7 @@ class nidHandler(object):
         # There should be two arguments: device and version
         device = args[0]
         version = args[1]
+        self._cmd_ev.clear()
         self._cmd_msg = version_message(device, version)
         click.echo('Version check sent')
     
@@ -141,8 +143,9 @@ class nidHandler(object):
             click.echo('Parameter not found.')
         else:
             raw2 = raw_input("Enter new magnitude: ")
+            self._cmd_ev.clear()
             self._cmd_msg = set_dendrite(int(channel[0]), self.parameter_lookup[raw1], int(raw2))
-            click.echo("Parameter set."))
+            click.echo("Parameter set.")
 
 
     def send_identify(self, *args):
@@ -153,6 +156,7 @@ class nidHandler(object):
         if channel == []:
             channel = 1  
         print channel      
+        self._cmd_ev.clear()
         self._cmd_msg = identify_message(channel)
         click.echo('Identify channel ' + str(channel))
 
