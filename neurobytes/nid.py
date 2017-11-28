@@ -36,9 +36,9 @@ version_message = lambda dev, ver: [
 
 set_dendrite = lambda chan, dend, mag: [
     chr(0b11010000 | (chan<<1)),
-    chr(0b00000000 | (dend<<4) | (mag>>12)),
-    chr(mag>>4),
-    chr(mag<<4)
+    chr((dend<<4) | (mag>>12)),
+    chr(0xFF & mag>>4),
+    chr(0xFF & mag<<4)
 ]
 
 class potentialGraph(object):
