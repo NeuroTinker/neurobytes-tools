@@ -34,11 +34,16 @@ version_message = lambda dev, ver: [
     chr(0b00000000)
 ]
 
-set_dendrite = lambda chan, dend, mag: [
+# NID_SELECTED_COMMAND
+# 0b1101 - selected command header
+# 3-bit channel
+# 5-bit parameter
+# 16-bit data
+parameter_message = lambda chan, param, val: [
     chr(0b11010000 | (chan<<1)),
-    chr((dend<<4) | (mag>>12)),
-    chr(0xFF & mag>>4),
-    chr(0xFF & mag<<4)
+    chr((param<<4) | (val>>12)),
+    chr(0xFF & val>>4),
+    chr(0xFF & val<<4)
 ]
 
 class potentialGraph(object):
@@ -142,9 +147,9 @@ class nidHandler(object):
         if raw1 not in self.parameter_lookup:
             click.echo('Parameter not found.')
         else:
-            raw2 = raw_input("Enter new magnitude: ")
+            raw2 = raw_input("Enter new value: ")
             self._cmd_ev.clear()
-            self._cmd_msg = set_dendrite(int(channel[0]), self.parameter_lookup[raw1], int(raw2))
+            self._cmd_msg = parameter_message(int(channel[0]), self.parameter_lookup[raw1], int(raw2))
             click.echo("Parameter set.")
 
 
@@ -179,6 +184,8 @@ class nidHandler(object):
         'dendrite 2' : 0b011,
         'dendrite 3' : 0b100,
         'dendrite 4' : 0b101,
+        'pwm_span' : 0b101,
+        'pwm_zero' : 0b111
     }
 
     command_lookup = {
