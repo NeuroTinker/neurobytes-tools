@@ -53,11 +53,20 @@ class potentialGraph(object):
         3 : 223,
         4 : 224
     }
+
+    channel_data = {
+        1 : None,
+        2 : None,
+        3 : None,
+        4 : None
+    }
+
     # realtime potential graph
-    def __init__(self, num):
+    def __init__(self):
         self.fig = plt.figure()
         #self.ax = self.fig.add_subplot(self.plot_pos_lookup[num])
-        self.ax = self.fig.add_subplot(111)
+        # self.ax = self.add_channel(1)
+        # self.ax = self.fig.add_subplot(111)
 
         self.x = np.arange(300)
         self.y = [0] * 300
@@ -71,12 +80,25 @@ class potentialGraph(object):
         self.fig.canvas.draw()
         plt.show(block=False)
 
-    def update(self, data):
+    def update(self, data, channel):
         self.y[:-1] = self.y[1:]
         self.y[-1:] = [data]
         self.ax.autoscale_view(True, True, True)
         self.li.set_ydata(self.y)
         self.fig.canvas.draw()
+
+    def add_channel(self, channel):
+        x = np.arange(300)
+        y = [0] * 300
+        y[0] = -15000
+        y[1] = 15000
+        fig = self.fig.add_subplot(self.plot_pos_lookup[channel])
+        li, self.ax.plot(x, y)
+        self.plot_dict[channel] = (
+            x,
+            y,
+            self.
+        )
 
 
 class nidHandler(object):
