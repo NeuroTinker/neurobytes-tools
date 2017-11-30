@@ -47,12 +47,6 @@ parameter_message = lambda chan, param, val: [
 ]
 
 class potentialGraph(object):
-    plot_pos_lookup = {
-        1 : 221,
-        2 : 222,
-        3 : 223,
-        4 : 224
-    }
 
     channel_data = {
         1 : None,
@@ -61,49 +55,58 @@ class potentialGraph(object):
         4 : None
     }
 
+    subplots = {
+        1 : None,
+        2 : None,
+        3 : None,
+        4 : None
+    }
+
+    class channelSubplot(object):
+        plot_pos_lookup = {
+            1 : 221,
+            2 : 222,
+            3 : 223,
+            4 : 224
+        }
+
+        def __init__(self, channel, fig):
+            self.pos = self.plot_pos_lookup[channel]
+            self.fig = fig
+            self.ax = self.fig.add_subplot(self.pos)
+            self.x = np.arange(300)
+            self.y = [0] * 300
+            self.y[0] = -15000
+            self.y[1] = 15000
+
+            self.li, = self.ax.plot(self.x,self.y)
+
+            self.ax.relim()
+            self.ax.autoscale_view(True, True, True)
+        
+        def update(self, data):
+            self.y[:-1] = self.y[1:]
+            self.y[-1:] = [data]
+            self.ax.autoscale_view(True, True, True)
+            self.li.set_ydata(self.y)
+
     # realtime potential graph
     def __init__(self):
         self.fig = plt.figure()
-        #self.ax = self.fig.add_subplot(self.plot_pos_lookup[num])
-        # self.ax = self.add_channel(1)
-        # self.ax = self.fig.add_subplot(111)
-
-        self.x = np.arange(300)
-        self.y = [0] * 300
-        self.y[0] = -15000
-        self.y[1] = 15000
-
-        self.li, = self.ax.plot(self.x,self.y)
-
-        self.ax.relim()
-        self.ax.autoscale_view(True, True, True)
         self.fig.canvas.draw()
         plt.show(block=False)
 
     def update(self, data, channel):
-        self.y[:-1] = self.y[1:]
-        self.y[-1:] = [data]
-        self.ax.autoscale_view(True, True, True)
-        self.li.set_ydata(self.y)
+        if subplots[channel] is not None:
+            subplots[channel].update(data)
         self.fig.canvas.draw()
 
     def add_channel(self, channel):
-        x = np.arange(300)
-        y = [0] * 300
-        y[0] = -15000
-        y[1] = 15000
-        fig = self.fig.add_subplot(self.plot_pos_lookup[channel])
-        li, self.ax.plot(x, y)
-        self.plot_dict[channel] = (
-            x,
-            y,
-            self.
-        )
-
+        if subplots[channel] is None:
+            subplots[channel] = channelSubplot(channel, self.fig)
+        self.fig.canvas.draw()
 
 class nidHandler(object):
-
-    graphs = {}
     
     def io_loop_runnable(self):
         # run loop to get commands from user
@@ -185,7 +188,6 @@ class nidHandler(object):
         print channel      
         self._cmd_ev.clear()
         self._cmd_msg = identify_message(channel)
-        click.echo('Identify channel ' + str(channel))
 
     def recv_quit(self, *args, **kwargs):
         self._quit_ev.set()
@@ -195,11 +197,12 @@ class nidHandler(object):
         header = msg_segments[0]
         data = msg_segments[1]
         channel = (header >> 5) & 0b111
-        if channel in self.graphs:
-            self.graphs[channel].update(data)
+        if channel in self.graph_controller.channel_data:
+            self.graph_controller.update(data)
         else:
             click.echo ("Channel " + str(channel) + " identified")
-            self.graphs[channel] = potentialGraph(channel)
+            self.graph_controller.add_channel(channel)
+            # TODO: send an identify cmd message after opening new channel
     
     parameter_lookup = {
         'dendrite 1' : 0b010,
@@ -223,7 +226,6 @@ class nidHandler(object):
     }
 
     def __init__(self, serial_port='/dev/ttyACM1'):
-
         # initialize serial connection with NID
         self.usb = serial.Serial(serial_port, baudrate=38400)
 
@@ -242,6 +244,8 @@ class nidHandler(object):
         self.serial_thread.daemon = True
     
     def start(self):
+        # start graphing window
+        self.graph_controller = potentialGraph()
 
         self.io_thread.start()
         self.nid_thread.start()
