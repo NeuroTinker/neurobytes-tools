@@ -34,6 +34,8 @@ version_message = lambda dev, ver: [
     chr(0b00000000)
 ]
 
+FIRE_THRESHOLD = 10000
+
 # NID_SELECTED_COMMAND
 # 0b1101 - selected command header
 # 3-bit channel
@@ -74,8 +76,8 @@ class potentialGraph(object):
             self.pos = self.plot_pos_lookup[channel]
             self.fig = fig
             self.ax = self.fig.add_subplot(self.pos)
-            self.x = np.arange(300)
-            self.y = [0] * 300
+            self.x = np.arange(100)
+            self.y = [0] * 100
             self.y[0] = -15000
             self.y[1] = 15000
 
@@ -97,13 +99,13 @@ class potentialGraph(object):
         plt.show(block=False)
 
     def update(self, data, channel):
-        if subplots[channel] is not None:
-            subplots[channel].update(data)
+        if self.subplots[channel] is not None:
+            self.subplots[channel].update(data)
         self.fig.canvas.draw()
 
     def add_channel(self, channel):
-        if subplots[channel] is None:
-            subplots[channel] = channelSubplot(channel, self.fig)
+        if self.subplots[channel] is None:
+            self.subplots[channel] = self.channelSubplot(channel, self.fig)
         self.fig.canvas.draw()
 
 class nidHandler(object):
@@ -135,10 +137,7 @@ class nidHandler(object):
                 for i in xrange(num_msg_waiting):
                     raw_msg = self.usb.read(4)
                     msg_as_uint32 = struct.unpack_from(">I", raw_msg)
-                    # print bin(msg_as_uint32[0])
-                    # print (num_msg_waiting)
                     header = (msg_as_uint32[0] >> 28) & 0b1111
-                    # print bin(header)
                     try:
                         handler = self.message_lookup[header]
                         handler(self, raw_msg)
@@ -197,8 +196,13 @@ class nidHandler(object):
         header = msg_segments[0]
         data = msg_segments[1]
         channel = (header >> 5) & 0b111
-        if channel in self.graph_controller.channel_data:
-            self.graph_controller.update(data)
+        if self.graph_controller.subplots[channel] is not None:
+            if data > FIRE_THRESHOLD:
+                self._data_fire = True
+            self._data_val = data
+            self._data_ch = channel
+            self._data_ev.set()
+            #self.graph_controller.update(data, channel) 
         else:
             click.echo ("Channel " + str(channel) + " identified")
             self.graph_controller.add_channel(channel)
@@ -210,7 +214,8 @@ class nidHandler(object):
         'dendrite 3' : 0b100,
         'dendrite 4' : 0b101,
         'pwm_span' : 0b101,
-        'pwm_zero' : 0b111
+        'pwm_zero' : 0b111,
+        'delay' : 0b111
     }
 
     command_lookup = {
@@ -218,7 +223,22 @@ class nidHandler(object):
         'blink' : send_blink,
         'quit'  : recv_quit,
         'version' : send_version,
-        'set' : set_parameter
+        'set' : set_parameter,
+        'save' : save_data
+    }
+
+    ch_freq = {
+        1 : 0,
+        2 : 0,
+        3 : 0,
+        4 : 0
+    }
+
+    ch_period = {
+        1 : 0,
+        2 : 0,
+        3 : 0,
+        4 : 0
     }
 
     message_lookup = {
@@ -234,6 +254,8 @@ class nidHandler(object):
         self._cmd_ev = threading.Event()
         self._ping_ev = threading.Event()
         self._quit_ev = threading.Event()
+        self._data_ev = threading.Event()
+        self._data_val = 0
 
         self.io_thread = threading.Thread(target=self.io_loop_runnable)
         self.nid_thread = threading.Timer(0.2, self.nid_ping_timed)
@@ -246,12 +268,28 @@ class nidHandler(object):
     def start(self):
         # start graphing window
         self.graph_controller = potentialGraph()
+        self.graph_controller.add_channel(1)
+        self.graph_controller.add_channel(2)
+        self.graph_controller.add_channel(3)
+        self.graph_controller.add_channel(4)
+        self._data_ch = 1
+        self._data_val = 0
 
         self.io_thread.start()
         self.nid_thread.start()
         self.serial_thread.start()
 
     def wait_for_quit(self):
+        while not self._quit_ev.isSet():
+            if self._data_ev.isSet():
+                if self._data_fire:
+                    # channel had a firing event. Increment frequency counter
+                    self.graph_controller.update(self.ch_period, 1)
+                self.graph_controller.update(self._data_val, self._data_ch)
+                self._data_ev.clear()
+            time.sleep(0.01)
+            if self.ch_period[0] < 100:
+                self.ch_period[0] += 1
         self._quit_ev.wait()
         quit()
 

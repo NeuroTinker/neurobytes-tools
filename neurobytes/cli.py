@@ -19,7 +19,7 @@ def nid():
     except:
         click.echo("Couldn't connect to NID! Make sure the NID is connected and try again")
     nid_handle.start()
-    nid_handle._quit_ev.wait()
+    nid_handle.wait_for_quit()
 
 @click.command()
 
