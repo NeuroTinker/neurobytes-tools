@@ -91,6 +91,8 @@ class potentialGraph(object):
             self.y[-1:] = [data]
             self.ax.autoscale_view(True, True, True)
             self.li.set_ydata(self.y)
+            self.ax.draw_artist(self.ax.patch)
+            self.ax.draw_artist(self.li)
 
     # realtime potential graph
     def __init__(self):
@@ -101,7 +103,8 @@ class potentialGraph(object):
     def update(self, data, channel):
         if self.subplots[channel] is not None:
             self.subplots[channel].update(data)
-        self.fig.canvas.draw()
+        self.fig.canvas.draw_idle()
+        self.fig.canvas.flush_events()
 
     def add_channel(self, channel):
         if self.subplots[channel] is None:
@@ -223,8 +226,7 @@ class nidHandler(object):
         'blink' : send_blink,
         'quit'  : recv_quit,
         'version' : send_version,
-        'set' : set_parameter,
-        'save' : save_data
+        'set' : set_parameter
     }
 
     ch_freq = {
@@ -282,14 +284,17 @@ class nidHandler(object):
     def wait_for_quit(self):
         while not self._quit_ev.isSet():
             if self._data_ev.isSet():
-                if self._data_fire:
-                    # channel had a firing event. Increment frequency counter
-                    self.graph_controller.update(self.ch_period, 1)
+                # if self._data_fire:
+                #     # channel had a firing event. Increment frequency counter
+                #     self.graph_controller.update(self.ch_period, 1)
                 self.graph_controller.update(self._data_val, self._data_ch)
                 self._data_ev.clear()
-            time.sleep(0.01)
-            if self.ch_period[0] < 100:
-                self.ch_period[0] += 1
+            # time.sleep(0.01)
+            self._data_ev.wait()
+                # if self._data_fire:
+                #     # channel had a firing event. Increment frequency counter
+            # if self.ch_period[0] < 100:
+            #     self.ch_period[0] += 1
         self._quit_ev.wait()
         quit()
 
