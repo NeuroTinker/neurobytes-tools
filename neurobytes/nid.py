@@ -34,6 +34,13 @@ version_message = lambda dev, ver: [
     chr(0b00000000)
 ]
 
+pause_message = [
+    chr(0b11000000),
+    chr(0b11000000),
+    chr(0b00000000),
+    chr(0b00000000)
+]
+
 FIRE_THRESHOLD = 10000
 
 # NID_SELECTED_COMMAND
@@ -103,7 +110,7 @@ class potentialGraph(object):
     def update(self, data, channel):
         if self.subplots[channel] is not None:
             self.subplots[channel].update(data)
-        self.fig.canvas.draw_idle()
+        self.fig.canvas.blit()        
         self.fig.canvas.flush_events()
 
     def add_channel(self, channel):
@@ -157,6 +164,11 @@ class nidHandler(object):
         self._cmd_ev.clear()
         self._cmd_msg = blink_message
         click.echo('Blink sent')
+
+    def send_pause(self, *args):
+        self._cmd_ev.clear()
+        self._cmd_msg = pause_message
+        click.echo('Pause sent')
     
     def send_version(self, *args):
         # There should be two arguments: device and version
@@ -226,7 +238,8 @@ class nidHandler(object):
         'blink' : send_blink,
         'quit'  : recv_quit,
         'version' : send_version,
-        'set' : set_parameter
+        'set' : set_parameter,
+        'pause' : send_pause
     }
 
     ch_freq = {
