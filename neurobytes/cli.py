@@ -68,6 +68,11 @@ def flash(elf, dev, interface):
     except ConnectError:
         print "connect error"
     while True:
+        if raw_input() == 'q':
+            gdb_thread.quit()
+            click.echo('Quitting...')
+            time.sleep(1)
+            break
         time.sleep(1)
 
 cli.add_command(flash)
