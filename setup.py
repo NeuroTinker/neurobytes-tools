@@ -2,11 +2,11 @@ from setuptools import setup
 
 setup(
     name = "neurobytes",
-    version = "0.18",
+    version = "0.2",
     description = "NeuroBytes Python Module and CLI",
     url = "https://github.com/NeuroTinker/neurobytes-python",
     author = "Jarod White",
-    author_email = "jrwhite20@gmail.com",
+    author_email = "jarod@neurotinker.com",
     license = "GNU",
     packages = ["neurobytes", "neurobytes.interfaces", "neurobytes.firmware"],
     zip_safe = False,
