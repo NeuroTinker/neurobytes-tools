@@ -13,6 +13,8 @@ setup(
     entry_points ={'console_scripts': ['neurobytes=neurobytes.cli:cli']},
     include_package_data=True,
     install_requires=[
-        'click'
+        'click',
+        'matplotlib',
+        'numpy'
     ]
 )
