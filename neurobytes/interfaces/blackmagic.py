@@ -67,6 +67,11 @@ if __name__ == "__main__":
                 raise neurobytes.exceptions.InterfaceError("BlackMagic Probe not detected.")
 
     try:
+        gdb.execute("mon enter_swd")
+    except:
+        pass
+
+    try:
         gdb.execute("mon tpwr enable")
         str = gdb.execute("mon swdp_scan")
     except:

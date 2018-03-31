@@ -1,0 +1,3 @@
+[console_scripts]
+neurobytes = neurobytes.cli:cli
+
