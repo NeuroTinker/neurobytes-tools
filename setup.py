@@ -14,7 +14,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'click',
-        'matplotlib',
-        'numpy'
+        'numpy==1.8.2',
+        'matplotlib==1.4.2',
+        'six==1.9'
     ]
 )
