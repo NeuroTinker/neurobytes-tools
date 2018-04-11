@@ -2,7 +2,7 @@
 
 ## Installation
 Install dependencies
->sudo apt-get install gdb-arm-none-eabi python-pip
+>sudo apt-get install gdb-arm-none-eabi python-pip python-tk
 
 Install neurobytes CLI,
 >sudo pip install neurobytes
@@ -19,7 +19,7 @@ Flash latest firmware
 >neurobytes flash
 
 Flash *.elf file from your current directory (file name optional)
->neurobytes program -e {FILE_NAME.elf}
+>neurobytes flash -e {FILE_NAME.elf}
 
 ## NID
 Communicate with a NeuroBytes network using the Network Interface Device (NID).
