@@ -6,7 +6,7 @@ setup(
     description = "NeuroBytes Python Module and CLI",
     url = "https://github.com/NeuroTinker/neurobytes-python",
     author = "Jarod White",
-    author_email = "jrwhite20@gmail.com",
+    author_email = "jarod@neurotinker.com",
     license = "GNU",
     packages = ["neurobytes", "neurobytes.interfaces", "neurobytes.firmware"],
     zip_safe = False,
@@ -14,7 +14,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'click',
-        'matplotlib',
-        'numpy'
+        'numpy==1.8.2',
+        'matplotlib==1.4.2',
+        'six==1.9'
     ]
 )
