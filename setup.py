@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "neurobytes",
-    version = "0.18",
+    version = "0.2",
     description = "NeuroBytes Python Module and CLI",
     url = "https://github.com/NeuroTinker/neurobytes-python",
     author = "Jarod White",
@@ -13,6 +13,8 @@ setup(
     entry_points ={'console_scripts': ['neurobytes=neurobytes.cli:cli']},
     include_package_data=True,
     install_requires=[
-        'click'
+        'click',
+        'matplotlib',
+        'numpy'
     ]
 )

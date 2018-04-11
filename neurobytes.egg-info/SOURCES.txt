@@ -4,9 +4,11 @@ setup.py
 neurobytes/__init__.py
 neurobytes/autoflash.py
 neurobytes/cli.py
+neurobytes/directflash.py
 neurobytes/exceptions.py
 neurobytes/gdbProcess.py
 neurobytes/nid.py
+neurobytes/testflash.py
 neurobytes.egg-info/PKG-INFO
 neurobytes.egg-info/SOURCES.txt
 neurobytes.egg-info/dependency_links.txt

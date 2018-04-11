@@ -12,17 +12,10 @@ def cli():
     pass
 @click.command()
 
-@click.option(
-    '--dev',
-    '-d',
-    default = "/dev/ttyACM1",
-    help="Specify device to use as NID"
-)
-
-def nid(dev):
+def nid():
     click.echo('Initializing Network Interface Device...')
     try:
-        nid_handle = nidO.nidHandler(dev)
+        nid_handle = nidO.nidHandler()
     except:
         click.echo("Couldn't connect to NID! Make sure the NID is connected and try again")
     nid_handle.start()

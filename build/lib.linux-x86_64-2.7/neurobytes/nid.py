@@ -83,10 +83,10 @@ class potentialGraph(object):
             self.pos = self.plot_pos_lookup[channel]
             self.fig = fig
             self.ax = self.fig.add_subplot(self.pos)
-            self.x = np.arange(50)
-            self.y = [0] * 50
-            self.y[0] = -35000
-            self.y[1] = 35000
+            self.x = np.arange(100)
+            self.y = [0] * 100
+            self.y[0] = -15000
+            self.y[1] = 15000
 
             self.li, = self.ax.plot(self.x,self.y)
 
