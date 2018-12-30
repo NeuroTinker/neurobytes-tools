@@ -3,10 +3,13 @@ import re
 import struct
 import neurobytes.exceptions
 import time
+import csv
+import datetime
 
 # TODO: move the gdb script to a gdb interface file
 
 device_types = {
+    0 : "virgin",
     1 : "interneuron",
     2 : "photoreceptor",
     3 : "motor_neuron",
@@ -18,7 +21,32 @@ device_types = {
 }
 
 fingerprint_elf_address = 0x023e00
+import csv
+import os
+import pwd
+import datetime
+import time
 elf_path = "/usr/local/lib/python2.7/dist-packages/neurobytes/firmware/"
+log_path = os.path.expanduser('~') + "/neurobytes_log.csv"
+
+def get_new_fingerprint():
+    with open(log_path, 'r+') as f:
+        reader = csv.DictReader(f, delimiter=',', quotechar='|')
+        for row in reader:
+            pass
+        new_fingerprint=int(row['id'])+1
+    return new_fingerprint
+        
+def log_fingerprint(unique_id, device_type, version):
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    # user = os.getLogin()
+    user = pwd.getpwuid(os.getuid())[0]
+    with open(log_path, 'a') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='|')
+        # writer.writerow('id': unique_id, 'version': version, 'type': device_type, 'user': user, 'timestamp': timestamp)
+        writer.writerow([unique_id, timestamp, version, device_type, user])
+
 
 def read_fingerprint():
     inferior = gdb.selected_inferior()
@@ -78,6 +106,11 @@ if __name__ == "__main__":
         pass
 
     try:
+        gdb.execute("mon enter_swd")
+    except:
+        pass
+
+    try:
         gdb.execute("attach 1")
         print "attached"
     except:
@@ -85,6 +118,8 @@ if __name__ == "__main__":
         pass
     try:
         (device_type, firmware_version, unique_id) = read_fingerprint()
+        if device_type == 0:
+            unique_id = get_new_fingerprint()
         print "Connected to {} {}\n".format(device_types[device_type], unique_id)
         print device_types[device_type]
         firmware_path = local_elf()

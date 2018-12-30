@@ -16,7 +16,7 @@ class gdbProcess(object):
 
     connected = False
 
-    def __init__(self, interval, interface, local_elf=None):
+    def __init__(self, interval, interface, local_elf=None,):
 
         click.echo("Connect a NeuroBytes board to flash")
         click.echo("Press 'q' to quit")
