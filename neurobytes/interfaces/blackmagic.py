@@ -155,6 +155,8 @@ def log_fingerprint(unique_id, device_type, version):
         # writer.writerow('id': unique_id, 'version': version, 'type': device_type, 'user': user, 'timestamp': timestamp)
         writer.writerow([unique_id, timestamp, version, device_type, user])
 
+log_fingerprint(5002, 0, 0)
+
 
 def read_fingerprint():
     inferior = gdb.selected_inferior()
@@ -226,18 +228,19 @@ if __name__ == "__main__":
         pass
     try:
         (device_type, firmware_version, unique_id) = read_fingerprint()
-        if device_type == 0:
+        if unique_id == 0:
+            print 'debug\n'
             unique_id = get_new_fingerprint()
-        print "Connected to {} {}\n".format(device_types[device_type], unique_id)
-        print device_types[device_type]
+        print "Connected debug to {} {}\n".format(device_types[device_type], unique_id)
+        # print device_types[device_type]
+        log_fingerprint(unique_id, device_type, 0)
         firmware_path = local_elf()
         if firmware_path is None:
             firmware_path = release_elf(device_type)
-        print firmware_path
+        # print firmware_path
         make_elf(firmware_path, unique_id)
         gdb.execute("file " + firmware_path)
         gdb.execute("load")
-        log_fingerprint(unique_id, device_type, 0)
     except:
         pass
     

@@ -57,6 +57,9 @@ class gdbProcess(object):
                                 click.echo(" COMPLETE")
                         elif "Connected " in line:
                             click.echo(line)
+                        elif "debug" in line:
+                            click.echo(line)
+                            click.echo('debug')
                         else:
                             pass
                             #click.echo(line)
