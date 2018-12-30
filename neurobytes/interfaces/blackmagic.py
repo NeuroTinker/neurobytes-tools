@@ -120,8 +120,7 @@ if __name__ == "__main__":
     try:
         (device_type, firmware_version, unique_id) = read_fingerprint()
         print "debug"
-        if device_type == 0:
-            unique_id = get_new_fingerprint()
+        unique_id = get_new_fingerprint()
         print "Connected to {} {}\n".format(device_types[device_type], unique_id)
         print device_types[device_type]
         firmware_path = local_elf()
@@ -131,7 +130,7 @@ if __name__ == "__main__":
         make_elf(firmware_path, unique_id)
         gdb.execute("file " + firmware_path)
         gdb.execute("load")
-        log_fingerprint(unique_id, 0, 0)
+        log_fingerprint(unique_id, device_types[device_type], 1.2)
     except:
         pass
     

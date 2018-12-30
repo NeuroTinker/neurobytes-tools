@@ -25,6 +25,7 @@ class gdbProcess(object):
         thread.start()
 
     def run(self):
+        last_line = ""
         while (True):
             flash_count = 0
             try:
@@ -48,7 +49,7 @@ class gdbProcess(object):
                             if flash_count == 1:
                                 bar = click.progressbar(length=4, label="flashing...")
                                 bar.update(1)
-                            elif flash_count <4:
+                            elif flash_count < 4:
                                 bar.update(1)
                             else:
                                 flash_count = 0
@@ -56,7 +57,10 @@ class gdbProcess(object):
                                 bar.update(1)
                                 click.echo(" COMPLETE")
                         elif "Connected " in line:
-                            click.echo(line)
+                            
+                            if line != last_line:
+                                click.echo(line)
+                            last_line = line
                         else:
                             pass
                             # click.echo(line)
