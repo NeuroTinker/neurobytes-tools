@@ -61,6 +61,8 @@ class gdbProcess(object):
                             if line != last_line:
                                 click.echo(line)
                             last_line = line
+                        elif "failed" in line:
+                            click.echo("Flash failed")
                         else:
                             pass
                             # click.echo(line)

@@ -131,7 +131,9 @@ if __name__ == "__main__":
         gdb.execute("file " + firmware_path)
         gdb.execute("load")
         log_fingerprint(unique_id, device_types[device_type], 1.2)
+        gdb.execute("run") # run for testing
     except:
+        print "failed"
         pass
     
     try:
